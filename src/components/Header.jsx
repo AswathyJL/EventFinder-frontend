@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 
 const Header = ({isAllEventsPage, isDashboardPage, isEventDetailPage}) => {
   return (
-    <Navbar style={{zIndex:1}} className="border position-fixed w-100 rounded shadow-lg bg-primary">
+    <Navbar style={{zIndex:3}} className="border position-fixed w-100 rounded shadow-lg bg-primary">
         <Container>
           <Link to={'/'} style={{textDecoration:'none'}}>
             <Navbar.Brand style={{color:'white', fontSize:'2rem'}}>

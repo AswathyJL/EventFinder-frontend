@@ -1,16 +1,49 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import EventCard from './EventCard'
-import AddEvent from './AddEvent'
+import { getUserEventsAPI } from '../services/allAPI'
 
 const MyEvents = () => {
+  const [userEvents, setUserEvents] = useState("")
+  useEffect(()=>{
+    getUserEvents()
+  },[])
+
+  const getUserEvents = async ()=>{
+    const token = sessionStorage.getItem("token")
+        if(token)
+        {
+            const reqHeader = {
+                "Authorization":`Bearer ${token}`
+            }
+            try {
+                const result = await getUserEventsAPI(reqHeader)
+                console.log(result);
+                
+                if(result.status == 200)
+                {
+                    setUserEvents(result.data)
+                }
+            } catch (err) {
+                console.log(err);
+                
+            }
+        }
+  }
   return (
     <div style={{position:'relative'}}>
       <Row className='mt-3'>
-          <Col className='mb-3' sm={12} md={6} lg={4}>
-              <EventCard/>
-          </Col>
-          {/* <div className='text-danger fw-bolder'>Event not found!!!</div> */}
+            {
+              userEvents?.length>0 ?
+                userEvents?.map(event=>(
+                  <Col key={event?._id} className='mb-3' sm={12}  lg={4}>
+                  <EventCard displayData={event} insideMyEvents = {true}/>
+              </Col>
+                ))
+              
+              :
+              <div className='text-danger fw-bolder'>Event not found!!!</div>
+            }
       </Row>
       
     </div>

@@ -1,6 +1,7 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import { addEventsAPI } from '../services/allAPI';
 
 
 const AddEvent = () => {
@@ -17,16 +18,17 @@ const AddEvent = () => {
         setEventData({
           eventName: "",
           eventDescription: "",
+          eventWebsite:"",
           startDate: "",
           endDate: "",
           startTime: "",
           endTime: "",
-          locationCity: "",
-          locationState: "",
-          locationLink: "",
+          location_city: "",
+          location_state: "",
+          location_link: "",
           maxRegistrations: "",
           isFree: true, // New field for free registration
-          price: "",
+          entryFee: "",
           paymentMode: "",
           audienceType: "",
           eventType: "",
@@ -49,7 +51,7 @@ const AddEvent = () => {
     };
 
     const handleNextPage = () => setCurrentPage((prev) => prev + 1);
-  const handlePreviousPage = () => setCurrentPage((prev) => prev - 1);
+    const handlePreviousPage = () => setCurrentPage((prev) => prev - 1);
 
     const [eventData, setEventData] = useState({
       eventName: "",
@@ -59,25 +61,25 @@ const AddEvent = () => {
       endDate: "",
       startTime: "",
       endTime: "",
-      locationCity: "",
-      locationState: "",
-      locationLink:"",
+      location_city: "",
+      location_state: "",
+      location_link:"",
       maxRegistrations: "",
+      isFree:true,
+      entryFee:"",
+      paymentMode: "",
+      audienceType: "",
+      eventType: "",
+      tags: ""
     });
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       setEventData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleRegister = () => {
+    const handleRegister =async () => {
     
-      const { eventName, eventDescription,eventWebsite, startDate, endDate, startTime, endTime, locationCity, locationState, locationLink, maxRegistrations } = eventData;
-
-      // Check for required fields
-      if (!eventName || !eventDescription || !startDate || !startTime || !endTime || !locationCity || !locationState || !locationLink) {
-        alert("Please fill in all required fields.");
-        return;
-      }
+      const { eventName, eventDescription,eventWebsite, startDate, endDate, startTime, endTime, location_city, location_state, location_link, maxRegistrations, isFree, audienceType, eventType, tags } = eventData;
 
       // Check if start date is on or after the current date
       const currentDate = new Date().toISOString().split('T')[0]; // Get current date in 'yyyy-mm-dd' format
@@ -97,9 +99,60 @@ const AddEvent = () => {
         alert("Please enter a valid maximum registration count.");
         return;
       }
-    
-      alert("Event registered successfully!");
-      setShow(false); // Close the modal
+
+      // Check for required fields
+      if (!eventName || !eventDescription || !startDate || !startTime || !endTime || !location_city || !location_state || !location_link || !audienceType || !eventType || !tags) {
+        alert("Please fill in all required fields.");
+        return;
+      }else{
+        // const reqBody = new FormData()
+        // reqBody.append("eventName",eventName)
+        // reqBody.append("eventDescription",eventDescription)
+        // reqBody.append("eventWebsite",eventWebsite)
+        // reqBody.append("startDate",startDate)
+        // reqBody.append("endDate", endDate || startDate);
+        // reqBody.append("startTime",startTime)
+        // reqBody.append("endTime",endTime)
+        // reqBody.append("location_city",location_city)
+        // reqBody.append("location_state",location_state)
+        // reqBody.append("location_link",location_link)
+        // reqBody.append("maxRegistrationCount", maxRegistrations || 0);
+        // reqBody.append("isFree",isFree)
+        // reqBody.append("entryFee", isFree ? 0 : entryFee);
+        // reqBody.append("paymentMode",isFree ? "":paymentMode)
+        // reqBody.append("audienceType",audienceType)
+        // reqBody.append("eventType",eventType)
+        // reqBody.append("tags",tags)
+        const token = sessionStorage.getItem("token")
+        if(token)
+        {
+          const reqHeaders = {
+            "Authorization":`Bearer ${token}`
+        }
+          try {
+            console.log(eventData);
+            // console.log("FormData Content:");
+            // for (let [key, value] of reqBody.entries()) {
+            //   console.log(`${key}: ${value}`);}
+            const result = await addEventsAPI(eventData,reqHeaders)
+            if(result.status==200){
+              alert("Event registered successfully!");
+            setShow(false); // Close the modal
+            } else{
+              alert(result.response?.data)
+              console.log(result);
+              
+              console.log(result.response.data);
+              
+            }
+            
+            
+          } catch (err) {
+            console.log(err);
+            
+          }
+        }
+      }
     };
   return (
     <>
@@ -141,7 +194,7 @@ const AddEvent = () => {
               {/* Event description */}
               <Form.Group className="mb-3" controlId="formEventDescription"
               style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px' }}>
-                  <Form.Label className='text-primary fs-5'>Event Website (optio)</Form.Label>
+                  <Form.Label className='text-primary fs-5'>Event Website (optional)</Form.Label>
                   <Form.Control  placeholder="Enter Website" name="eventWebsite" value={eventData.eventWebsite} onChange={handleInputChange}/>
               </Form.Group>
   
@@ -183,10 +236,10 @@ const AddEvent = () => {
                 style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px' }}>
                     <Form.Label className='text-primary fs-5'>Location</Form.Label>
                     <InputGroup className="mb-3">
-                      <Form.Control aria-label="First name" placeholder='city' name="locationCity" value={eventData.locationCity} onChange={handleInputChange}/>
-                      <Form.Control aria-label="Last name"  placeholder='state' name="locationState" value={eventData.locationState} onChange={handleInputChange}/>
+                      <Form.Control aria-label="First name" placeholder='city' name="location_city" value={eventData.location_city} onChange={handleInputChange}/>
+                      <Form.Control aria-label="Last name"  placeholder='state' name="location_state" value={eventData.location_state} onChange={handleInputChange}/>
                     </InputGroup>
-                    <Form.Control   placeholder="Enter google map location link here..." name="locationLink" value={eventData.locationLink} onChange={handleInputChange}/>
+                    <Form.Control   placeholder="Enter google map location link here..." name="location_link" value={eventData.location_link} onChange={handleInputChange}/>
                 </Form.Group>
     
                 {/* Registration count */}
@@ -223,20 +276,20 @@ const AddEvent = () => {
                       setEventData((prev) => ({
                         ...prev,
                         isFree: e.target.checked,
-                        price: "",
+                        entryFee: "",
                       }))
                     }
                   />
                 </Form.Group>
                 {!eventData.isFree && (
                   <>
-                    <Form.Group className="mb-3" controlId="formPrice" style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px' }}>
-                      <Form.Label className="text-primary fs-5">Price</Form.Label>
+                    <Form.Group className="mb-3" controlId="formentryFee" style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px' }}>
+                      <Form.Label className="text-primary fs-5">Entry Fees</Form.Label>
                       <Form.Control
                         type="number"
-                        placeholder="Enter price"
-                        name="price"
-                        value={eventData.price}
+                        placeholder="Enter Entry Fees"
+                        name="entryFee"
+                        value={eventData.entryFee}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
@@ -281,6 +334,9 @@ const AddEvent = () => {
                     value={eventData.tags}
                     onChange={handleInputChange}
                   />
+                  <Form-text>
+                    Enter tags separated by space
+                  </Form-text>
                 </Form.Group>
               </>
             )}

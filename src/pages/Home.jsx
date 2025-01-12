@@ -1,12 +1,20 @@
 
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Card } from 'react-bootstrap'
 import EventCard from '../components/EventCard'
 import { Link } from 'react-router-dom'
 import main from '../assets/main.png'
+import { tokenAuthContext } from '../contexts/AuthContextAPI'
 
 
 const Home = () => {
+    const {isAuthorised,setIsAuthorised} = useContext(tokenAuthContext)
+    useEffect(()=>{
+        const token = sessionStorage.getItem("token");
+        setIsAuthorised(!!token);
+        },[])
+        console.log(isAuthorised);
+        
   return (
     <>
       <div style={{minHeight:'100vh', paddingTop:'100px'}} className="d-flex justify-content-center align-items-center rounded shadow w-100">
@@ -16,7 +24,12 @@ const Home = () => {
                           <h1 className='text-primary' style={{fontSize:'5rem'}}><i className="fa-solid fa-map-location-dot"></i>{' '}
                           EventFinder</h1>
                           <p style={{textAlign:'justify'}} className='text-primary-emphasis mt-4 mb-5'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Et delectus asperiores magni dignissimos. Pariatur harum natus, veniam enim at ab totam nihil nam maiores similique, incidunt vitae maxime nulla nisi!</p>
-                          <Link to={'/login'} className='btn btn-warning rounded-4'>START TO EXPLORE</Link>
+                          {
+                            isAuthorised ?
+                            <Link to={'/dashboard'} className='btn btn-warning rounded-4'>CONTINUE TO EXPLORE</Link>
+                            :
+                            <Link to={'/login'} className='btn btn-warning rounded-4'>START TO EXPLORE</Link>
+                          }
                       </div>
                       <div className='col-lg-1'></div>
                       <div className="col-lg-5">

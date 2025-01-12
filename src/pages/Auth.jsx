@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { FloatingLabel, Form, Spinner } from 'react-bootstrap'
 import authImg from '../assets/authImg.png'
 import { Link, useNavigate } from 'react-router-dom'
+import { loginAPI, registerAPI } from '../services/allAPI'
 
 
 const Auth = ({insideRegister}) => {
@@ -12,15 +13,35 @@ const Auth = ({insideRegister}) => {
     username:"", email:"", password:""
   })
   console.log(inputData);
+
+    //function handling register
   const handleRegister = async (e)=>{
     e.preventDefault()
     console.log(`inside handleRegister`);
     // call server after validation of values present
     if(inputData.username && inputData.email && inputData.password)
     {
-        // alert("make API call")
-        alert(`Welcome User, Please login to explore project fair!!!`)
-        navigate('/login')
+        try {
+            const result = await registerAPI(inputData)
+            console.log(result);
+            if(result.status == 200)
+            {
+                alert(`Welcome ${result.data?.username}, Please login to explore project fair!!!`)
+                navigate('/login')
+                setInputData({username:"",email:"",password:""})
+            }
+            else{
+                if(result.response.status==406)
+                    {
+                        alert(result.response.data)
+                        setInputData({username:"",email:"",password:""})
+                    }  
+            }
+            
+        } catch (err) {
+            console.log(err);
+            
+        }
     }
     else
     {
@@ -28,17 +49,34 @@ const Auth = ({insideRegister}) => {
     }
   }
 
+
+    //function handling login
   const handleLogin = async (e)=>{
     e.preventDefault()
     if(inputData.email && inputData.password)
     {
-      // make api call
-      setIsLogin(true)
-      setTimeout(() => {
-        setInputData({username:"", email:"", password:""})
-        navigate('/')
-        setIsLogin(false)
-      }, 2000);
+        try {
+            const result = await loginAPI(inputData)
+            if(result.status==200)
+            {
+                sessionStorage.setItem("user",JSON.stringify(result.data.user))
+                sessionStorage.setItem("token",result.data.token)
+                setIsLogin(true)
+                setTimeout(() => {
+                    setInputData({username:"", email:"", password:""})
+                    navigate('/')
+                    setIsLogin(false)
+                }, 2000);
+            }else{
+                if(result?.response?.status === 404)
+                {
+                    alert(result.response.data)
+                }
+            }
+        } catch (err) {
+            console.log(err);
+            
+        }
     }
     else{
         alert("Please fill the form completely!!!")
