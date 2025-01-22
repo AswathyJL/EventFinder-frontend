@@ -20,6 +20,7 @@ function App() {
   const isAllEventsPage = location.pathname === '/all-events';
   const isDashboardPage = location.pathname === '/dashboard';
   const isEventDetailPage = location.pathname.includes('/event');
+  const isHomePage = location.pathname === '/';
 
   useEffect(()=>{
     if(sessionStorage.getItem("token")){
@@ -32,7 +33,7 @@ function App() {
 
   return (
     <>
-      <Header isAllEventsPage={isAllEventsPage} isDashboardPage={isDashboardPage} isEventDetailPage={isEventDetailPage}/>
+      <Header isAllEventsPage={isAllEventsPage} isDashboardPage={isDashboardPage} isEventDetailPage={isEventDetailPage} isHomePage={isHomePage}/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         {

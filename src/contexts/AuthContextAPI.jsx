@@ -14,7 +14,7 @@ const AuthContextAPI = ({children}) =>{
             {
                 setIsAuthorised(false)
             }
-    },[isAuthorised])
+    },[])
 
     return (
         <tokenAuthContext.Provider value={{isAuthorised,setIsAuthorised}}>

@@ -7,12 +7,13 @@ import { loginAPI, registerAPI } from '../services/allAPI'
 
 
 const Auth = ({insideRegister}) => {
+  
   const [isLogin,setIsLogin]=useState(false)
   const navigate = useNavigate()
   const [inputData,setInputData] = useState({
     username:"", email:"", password:""
   })
-  console.log(inputData);
+//   console.log(inputData);
 
     //function handling register
   const handleRegister = async (e)=>{
@@ -68,9 +69,9 @@ const Auth = ({insideRegister}) => {
                     setIsLogin(false)
                 }, 2000);
             }else{
-                if(result?.response?.status === 404)
-                {
-                    alert(result.response.data)
+                if (result?.response?.status === 401 || result?.response?.status === 404) {
+                    alert(result.response.data || "Invalid credentials");
+                    setInputData({ username: "", email: "", password: "" });
                 }
             }
         } catch (err) {

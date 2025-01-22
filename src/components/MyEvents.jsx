@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import EventCard from './EventCard'
 import { getUserEventsAPI } from '../services/allAPI'
+import { isDeleteEventContext } from '../contexts/ContextAPI'
 
 const MyEvents = () => {
+  const {isDeleteEvent} = useContext(isDeleteEventContext)
   const [userEvents, setUserEvents] = useState("")
   useEffect(()=>{
     getUserEvents()
-  },[])
+  },[isDeleteEvent])
 
   const getUserEvents = async ()=>{
     const token = sessionStorage.getItem("token")

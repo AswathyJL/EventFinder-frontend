@@ -34,11 +34,18 @@ export const getEventDetailsAPI = async(id,reqHeader)=>{
 // getEventsWithFilterAPI - /event?search=${query}
 // applyEventAPI - /apply-event-
 // getAppliedEvents - /applied-events
+// saveEvent - /save-event
+export const saveEventAPI = async(reqBody,reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/save-event`,reqBody,reqHeader)
+}
 // getSavedEvents - /saved-events
 // deleteSavedEvents - /saved-events/:id
 // deleteAllSavedEvents - /saved-events
 // getMyEvents - /my-events
 // deleteMyEventsAPI - /my-events/:id
+export const removeEventAPI = async(id,reqHeader)=>{
+    return await commonAPI("DELETE",`${SERVER_URL}/${id}/remove`,{},reqHeader)
+}
 // getPastEvents - /past-events
 // deletePastEvents - /past-events/:id
 // deleteAllPastEvents - /past-events

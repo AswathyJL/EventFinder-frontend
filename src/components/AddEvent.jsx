@@ -1,12 +1,23 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
-import { addEventsAPI } from '../services/allAPI';
+import { addEventsAPI, editEventAPI } from '../services/allAPI';
+import { useLocation, useParams } from 'react-router-dom';
+import { isModifyEventContext } from '../contexts/ContextAPI';
 
 
-const AddEvent = () => {
+const AddEvent = ({displayData}) => {
+
+  const {setIsModifyEvent} = useContext(isModifyEventContext)
   const [show, setShow] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation()
+  const {id} = useParams()
+  // console.log(displayData);
+  // console.log(displayData.maxRegistrations===undefined);
+  
+
+  const isEventDetailPage = location.pathname.includes('/event');
 
     const handleClose = () =>{
       setShow(false)
@@ -14,11 +25,37 @@ const AddEvent = () => {
     }
 
     useEffect(() => {
-      if (!show) {
+      if (isEventDetailPage && displayData) {
+        // Prepopulate form fields with the data of the existing event for modification
+        setEventData({
+          eventName: displayData.eventName || "",
+          eventDescription: displayData.eventDescription || "",
+          eventWebsite: displayData.eventWebsite || "",
+          startDate: displayData.startDate || "",
+          endDate: displayData.endDate || "",
+          startTime: displayData.startTime || "",
+          endTime: displayData.endTime || "",
+          location_city: displayData.location_city || "",
+          location_state: displayData.location_state || "",
+          location_link: displayData.location_link || "",
+          maxRegistrations: displayData.maxRegistrations == "Unlimited" ? setIsNoMaxCount(true) : displayData.maxRegistrations,
+          isFree: displayData.isFree !== undefined ? displayData.isFree : true, // Default to true if not provided
+          entryFee: displayData.entryFee || "",
+          paymentMode: displayData.paymentMode || "",
+          audienceType: displayData.audienceType || "",
+          eventType: displayData.eventType || "",
+          tags: displayData.tags || "",
+        });
+    
+        // Set checkbox states based on existing data
+        setIsNoMaxCount(displayData.maxRegistrations === undefined);
+        setIsOneDayEvent(displayData.startDate === displayData.endDate);
+      } else {
+        // Initialize empty values for new event creation
         setEventData({
           eventName: "",
           eventDescription: "",
-          eventWebsite:"",
+          eventWebsite: "",
           startDate: "",
           endDate: "",
           startTime: "",
@@ -27,24 +64,30 @@ const AddEvent = () => {
           location_state: "",
           location_link: "",
           maxRegistrations: "",
-          isFree: true, // New field for free registration
+          isFree: true, // Default value
           entryFee: "",
           paymentMode: "",
           audienceType: "",
           eventType: "",
           tags: "",
         });
+    
         setIsNoMaxCount(false);
         setIsOneDayEvent(false);
       }
-    }, [show]); 
-    const handleShow = () => setShow(true);
+    }, [show, isEventDetailPage, displayData]);
+    const handleShow = () => {
+      
+      setShow(true);
+      
+    }
 
     const [isNoMaxCount, setIsNoMaxCount] = useState(false);
     const [isOneDayEvent, setIsOneDayEvent] = useState(false);
 
     const handleCheckboxRegistrationCount = (e) => {
       setIsNoMaxCount(e.target.checked);
+      
     };
     const handleOneDayEventChange = (e) => {
       setIsOneDayEvent(e.target.checked);
@@ -105,24 +148,6 @@ const AddEvent = () => {
         alert("Please fill in all required fields.");
         return;
       }else{
-        // const reqBody = new FormData()
-        // reqBody.append("eventName",eventName)
-        // reqBody.append("eventDescription",eventDescription)
-        // reqBody.append("eventWebsite",eventWebsite)
-        // reqBody.append("startDate",startDate)
-        // reqBody.append("endDate", endDate || startDate);
-        // reqBody.append("startTime",startTime)
-        // reqBody.append("endTime",endTime)
-        // reqBody.append("location_city",location_city)
-        // reqBody.append("location_state",location_state)
-        // reqBody.append("location_link",location_link)
-        // reqBody.append("maxRegistrationCount", maxRegistrations || 0);
-        // reqBody.append("isFree",isFree)
-        // reqBody.append("entryFee", isFree ? 0 : entryFee);
-        // reqBody.append("paymentMode",isFree ? "":paymentMode)
-        // reqBody.append("audienceType",audienceType)
-        // reqBody.append("eventType",eventType)
-        // reqBody.append("tags",tags)
         const token = sessionStorage.getItem("token")
         if(token)
         {
@@ -154,9 +179,77 @@ const AddEvent = () => {
         }
       }
     };
+
+    const handleUpdate = async ()=>{
+      
+      const { eventName, eventDescription,eventWebsite, startDate, endDate, startTime, endTime, location_city, location_state, location_link, maxRegistrations, isFree, audienceType, eventType, tags } = eventData;
+
+    
+      // Check if end date is after start date (if not one-day event)
+      if (!isOneDayEvent && new Date(endDate) <= new Date(startDate)) {
+        alert("End date must be after the start date.");
+        return;
+      }
+    
+      // Optional: Validate max registrations if not unlimited
+      if (!isNoMaxCount && (!maxRegistrations || maxRegistrations <= 0)) {
+        alert("Please enter a valid maximum registration count.");
+        return;
+      }
+
+      // Check for required fields
+      if (!eventName || !eventDescription || !startDate || !startTime || !endTime || !location_city || !location_state || !location_link || !audienceType || !eventType || !tags) {
+        alert("Please fill in all required fields.");
+        return;
+      }else{
+        const token = sessionStorage.getItem("token")
+        if(token)
+        {
+          const reqHeaders = {
+            "Authorization":`Bearer ${token}`
+        }
+          try {
+            console.log(eventData);
+            // console.log("FormData Content:");
+            // for (let [key, value] of reqBody.entries()) {
+            //   console.log(`${key}: ${value}`);}
+            const result = await editEventAPI(id,eventData,reqHeaders)
+            if(result.status==200){
+              alert("Event updated successfully!");
+              setIsModifyEvent(result.data)
+            setShow(false); // Close the modal
+            } else{
+              alert(result.response?.data)
+              console.log(result);
+              
+              console.log(result.response.data);
+              
+            }
+            
+            
+          } catch (err) {
+            console.log(err);
+            
+          }
+        }
+      }
+    }
+
+    function formatDateForDisplay(inputDate) {
+      const date = new Date(inputDate);
+      const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const year = String(date.getFullYear()).slice(-2); // Get the last two digits of the year
+      return `${day}/${month}/${year}`;
+  }
   return (
     <>
-        <button onClick={handleShow} style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold'>Add New Event</button>
+        {
+          isEventDetailPage ?
+          <button onClick={handleShow} style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold me-5'>Modify Event</button>
+          :
+          <button onClick={handleShow} style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold'>Add New Event</button>
+        }
 
         {/* register modal */}
         <Modal
@@ -168,7 +261,7 @@ const AddEvent = () => {
       >
         <Modal.Header closeButton>
           <Modal.Title className='text-primary fw-semibold'>
-          {currentPage === 1 ? "Add Event Details" : "Additional Information"}
+          {currentPage === 1 ? isEventDetailPage? "Update Event Details":"Add Event Details" : "Additional Information"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -179,7 +272,7 @@ const AddEvent = () => {
             {/* Event Name */}
               <Form.Group className="mb-3" controlId="formEventName"
               style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px' }}>
-                  <Form.Label className='text-primary fs-5'>Event Name</Form.Label>
+                  <Form.Label className='text-primary fs-5' >Event Name</Form.Label>
                   <Form.Control  placeholder="Enter event name here!" name="eventName" value={eventData.eventName} onChange={handleInputChange}/>
               </Form.Group>
   
@@ -209,10 +302,13 @@ const AddEvent = () => {
                       checked={isOneDayEvent}
                       onChange={handleOneDayEventChange}
                     />
-                    <Form.Label className='text-primary fs-5'>Event Starting Date</Form.Label>
+                    <Form.Label className='text-primary fs-5'>Event Starting Date {
+                     isEventDetailPage ? ": "+formatDateForDisplay(eventData.startDate) : ""}</Form.Label>
                     <Form.Control type='date'   placeholder="dd-mm-yyyy" name="startDate" value={eventData.startDate} onChange={handleInputChange} />
                 {/* End Date */}
-                    <Form.Label className='text-primary fs-5'>Event Ending Date</Form.Label>
+                    <Form.Label className='text-primary fs-5'>Event Ending Date{
+                      isEventDetailPage ? 
+                      eventData.endDate != eventData.startDate && ": "+formatDateForDisplay(eventData?.endDate) : ""}</Form.Label>
                     <Form.Control type='date'   placeholder="dd-mm-yyyy" disabled={isOneDayEvent} name="endDate" value={eventData.endDate} onChange={handleInputChange}/>
                 </Form.Group>
   
@@ -251,6 +347,7 @@ const AddEvent = () => {
                     label="Unlimited Registrations"
                     checked={isNoMaxCount}
                     onChange={handleCheckboxRegistrationCount}
+                    
                   />
                   <Form.Label className='text-primary fs-5'>Maximum Registrations Allowed</Form.Label>
                   <Form.Control
@@ -353,6 +450,11 @@ const AddEvent = () => {
               Next
             </Button>
           ) : (
+            isEventDetailPage ?
+            <Button variant="success" onClick={handleUpdate}>
+              Update Event
+            </Button>
+            :
             <Button variant="success" onClick={handleRegister}>
               Add Event
             </Button>
