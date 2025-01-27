@@ -5,7 +5,7 @@ import EventCard from '../components/EventCard'
 import Register from '../components/Register'
 import ApplicantManagement from '../components/ApplicantManagement'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getEventDetailsAPI, getUserDetailsByIdAPI, removeEventAPI } from '../services/allAPI'
+import { getEventDetailsAPI, getUserDetailsByIdAPI, removeEventAPI, saveEventAPI } from '../services/allAPI'
 import AddEvent from '../components/AddEvent'
 import { isDeleteEventContext, isModifyEventContext } from '../contexts/ContextAPI'
 
@@ -13,6 +13,7 @@ import { isDeleteEventContext, isModifyEventContext } from '../contexts/ContextA
 
 const EventDetail = () => {
     
+    const [isSaved, setIsSaved] = useState(false);
     const navigate = useNavigate()
     const {isDeleteEvent, setIsDeleteEvent} = useContext(isDeleteEventContext)
     const {isModifyEvent} = useContext(isModifyEventContext)
@@ -101,6 +102,29 @@ const EventDetail = () => {
         }
       };
       
+    const saveEvent = async (eventId) => {
+          if (isSaved) return; // Avoid duplicate saves
+    
+          const reqbody = { savedEvents:eventId };
+          const token = sessionStorage.getItem("token");
+          if (token) {
+              const reqHeader = {
+                  Authorization: `Bearer ${token}`,
+              };
+              try {
+                  const result = await saveEventAPI(reqbody, reqHeader);
+                  if (result.status === 200) {
+                      setIsSaved(true); // Mark as saved
+                      alert("Event is saved to your saved collections.");
+                  }else if(result.status === 406){
+                    // console.log(result);
+                    alert(result.response.data);
+                  }
+              } catch (err) {
+                  console.log(err);
+              }
+          }
+      };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -173,7 +197,7 @@ const EventDetail = () => {
                                       </Tooltip>
                                     }
                                   >
-                                    <button className='btn '><i className="fa-regular fa-bookmark text-warning"></i></button>
+                                    <button onClick={()=>saveEvent(eventDetails?._id)} className='btn '><i className="fa-regular fa-bookmark text-warning"></i></button>
                                 </OverlayTrigger>
                                 {
                                     isOwner && 

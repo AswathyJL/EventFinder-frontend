@@ -1,19 +1,40 @@
 
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Card } from 'react-bootstrap'
 import EventCard from '../components/EventCard'
 import { Link } from 'react-router-dom'
 import main from '../assets/main.png'
 import { tokenAuthContext } from '../contexts/AuthContextAPI'
+import { getHomeEventsAPI } from '../services/allAPI'
 
 
 const Home = () => {
+    const [homeEvents, setHomeEvents] = useState("")
     const {isAuthorised,setIsAuthorised} = useContext(tokenAuthContext)
     useEffect(()=>{
         const token = sessionStorage.getItem("token");
         setIsAuthorised(!!token);
+        getHomeProjects()
         },[])
-        console.log(isAuthorised);
+        // console.log(isAuthorised);
+
+        const getHomeProjects = async ()=>{
+            const token = sessionStorage.getItem("token")
+            if(token){
+                const reqHeader = {
+                "Authorization": `Bearer ${token}`
+                }
+                try {
+                const result = await getHomeEventsAPI(reqHeader)
+                if(result.status == 200){
+                    setHomeEvents(result.data)
+                }
+                } catch (err) {
+                console.log(err);
+                
+                }
+            }
+        }
         
   return (
     <>
@@ -38,17 +59,24 @@ const Home = () => {
                   </div>
               </div>
       </div>
-      <div className='mt-5 text-center'>
-          <h1 className='mb-5'>Explore Events Projects</h1>
+      {
+        homeEvents?.length>0 &&
+        <div className='mt-5 text-center'>
+          <h1 className='mb-5'>Explore Events</h1>
           <marquee behavior="" direction="">
               <div className="d-flex">
-                  <div className="me-5">
-                      <EventCard />
+                  {
+                    homeEvents?.map(event=>
+                        <div className="me-5">
+                      <EventCard displayData={event}/>
                   </div>
+                    )
+                  }
               </div>
           </marquee>
           <button className='btn btn-link mt-5'>CLICK HERE TO VIEW MORE EVENTS...</button>
       </div>
+      }
       <div className="d-flex justify-content-center align-items-center mt-5 flex-column">
           <h1>Our Testimonials</h1>
           <div className='d-flex align-items-center justify-content-evenly mt-3 w-100'>

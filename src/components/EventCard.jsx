@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Card } from 'react-bootstrap'
-import { getUserDetailsByIdAPI, saveEventAPI } from '../services/allAPI'
+import React, { useContext, useEffect, useState } from 'react'
+import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { deleteSavedEventByIdAPI, getUserDetailsByIdAPI, saveEventAPI } from '../services/allAPI'
 import { Link } from 'react-router-dom'
+import { isSavedEventDeletedContext } from '../contexts/ContextAPI'
 
 
-const EventCard = ({displayData, insideMyEvents}) => {
+const EventCard = ({displayData, insideMyEvents, insideSavedEvents}) => {
 
+  const {isSavedEventDeleted, setIsSavedEventDeleted} = useContext(isSavedEventDeletedContext)
   const [isSaved, setIsSaved] = useState(false);
   const [eventOwner,setEventOwner] = useState("")
   // console.log(displayData);
@@ -49,12 +51,36 @@ const EventCard = ({displayData, insideMyEvents}) => {
               if (result.status === 200) {
                   setIsSaved(true); // Mark as saved
                   alert("Event is saved to your saved collections.");
+              }else if(result.status === 406){
+                // console.log(result);
+                alert(result.response.data);
               }
           } catch (err) {
               console.log(err);
           }
       }
   };
+
+  const deleteSavedEvent = async (eventId) =>{
+    const reqbody = {eventId}
+    const token = sessionStorage.getItem("token");
+      if (token) {
+          const reqHeader = {
+              Authorization: `Bearer ${token}`,
+          };
+          try {
+              const result = await deleteSavedEventByIdAPI(reqbody, reqHeader);
+              if (result.status === 200) {
+                setIsSavedEventDeleted(result)
+                  alert("Event is removed from saved collections.");
+              }else if(result.status === 404){
+                alert(result.response.data);
+              }
+          } catch (err) {
+              console.log(err);
+          }
+      }
+  }
   
 
   return (
@@ -74,8 +100,16 @@ const EventCard = ({displayData, insideMyEvents}) => {
           {
             insideMyEvents ? 
             <Card.Link className='btn'><i className="fa-solid fa-star text-warning"></i></Card.Link>
+            : insideSavedEvents ?
+            <OverlayTrigger key="bottom" placement="bottom"
+             overlay={
+              <Tooltip>Remove from Saved Events
+              </Tooltip>
+            }>        
+            <button onClick={()=>deleteSavedEvent(displayData?._id)} className='btn'><i className="fa-solid fa-trash text-warning"></i></button></OverlayTrigger>
             :
             <button onClick={()=>saveEvent(displayData?._id)} className='btn'><i className="fa-regular fa-bookmark text-warning"></i></button>
+
           }
         </div>
       </Card.Body>

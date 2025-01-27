@@ -31,6 +31,10 @@ export const getUserEventsAPI = async(reqHeader)=>{
 export const getEventDetailsAPI = async(id,reqHeader)=>{
     return await commonAPI("GET",`${SERVER_URL}/${id}/event`,{},reqHeader)
 }
+// getHomeEventsAPI
+export const getHomeEventsAPI = async(reqHeader)=>{
+    return await commonAPI("GET",`${SERVER_URL}/home-events`,{},reqHeader)
+}
 // getEventsWithFilterAPI - /event?search=${query}
 // applyEventAPI - /apply-event-
 // getAppliedEvents - /applied-events
@@ -39,8 +43,17 @@ export const saveEventAPI = async(reqBody,reqHeader)=>{
     return await commonAPI("POST",`${SERVER_URL}/save-event`,reqBody,reqHeader)
 }
 // getSavedEvents - /saved-events
+export const getSavedEventAPI = async(reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/save-event/view`,{},reqHeader)
+}
 // deleteSavedEvents - /saved-events/:id
+export const deleteSavedEventByIdAPI = async(reqBody,reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/remove-saved-event`,reqBody,reqHeader)
+}
 // deleteAllSavedEvents - /saved-events
+export const deleteAllSavedEventsAPI = async(reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/remove-all-saved-events`,{},reqHeader)
+}
 // getMyEvents - /my-events
 // deleteMyEventsAPI - /my-events/:id
 export const removeEventAPI = async(id,reqHeader)=>{

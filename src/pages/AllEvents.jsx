@@ -14,6 +14,7 @@ const AllEvents = () => {
   useEffect(()=>{
     getAllEvents()
   },[searchKey])
+  
   const getAllEvents = async ()=>{
     const token = sessionStorage.getItem("token")
     if(token){
