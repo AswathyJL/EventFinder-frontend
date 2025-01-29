@@ -246,7 +246,7 @@ const AddEvent = ({displayData}) => {
     <>
         {
           isEventDetailPage ?
-          <button onClick={handleShow} style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold me-5'>Modify Event</button>
+          <button onClick={handleShow} style={{position:'absolute',  right:'1rem'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold me-5'>Modify Event</button>
           :
           <button onClick={handleShow} style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-warning rounded-pill px-4 border-2 fw-bold'>Add New Event</button>
         }

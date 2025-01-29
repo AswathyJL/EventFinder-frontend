@@ -1,16 +1,19 @@
 import React, { useContext, useState } from 'react'
-import { Tab, Tabs } from 'react-bootstrap'
+import { OverlayTrigger, Tab, Tabs, Tooltip } from 'react-bootstrap'
 import SavedEvents from './SavedEvents';
 import AppliedEvents from './AppliedEvents';
 import MyEvents from './MyEvents';
 import PastEvents from './PastEvents';
 import Profile from './Profile';
 import AddEvent from './AddEvent';
+import { deleteAllSavedEventsAPI } from '../services/allAPI';
+import { isSavedEventDeletedContext } from '../contexts/ContextAPI';
 
 
 
 const View = () => {
-  // const {insideMyEvent, setInsideMyEvent}=useContext(insideMyEventsContext)
+
+  const {isSavedEventDeleted, setIsSavedEventDeleted} = useContext(isSavedEventDeletedContext)
   const [activeKey, setActiveKey] = useState('applied'); 
 
   const handleSelect = (key) => {
@@ -20,6 +23,29 @@ const View = () => {
   const getTabStyle = (key) => {
     return activeKey === key ? 'text-warning' : 'text-primary'; 
   };
+
+  const handleDeleteAll= async ()=>{
+    const token = sessionStorage.getItem("token")
+      if(token)
+      {
+          const reqHeader = {
+              "Authorization":`Bearer ${token}`
+          }
+          try {
+              const result = await deleteAllSavedEventsAPI(reqHeader)
+              console.log(result);
+              
+              if(result.status == 200)
+              {
+                  setIsSavedEventDeleted(result.data)
+                  alert(result.data.message)
+              }
+          } catch (err) {
+              console.log(err);
+              
+          } 
+      }
+  }
   return (
     // display the saved events , applied events, past events and my events on the dashboard
     <>
@@ -35,6 +61,13 @@ const View = () => {
       </Tab>
       <Tab eventKey="saved" title={<span className={getTabStyle('saved')}>Saved Events</span>} >
         <SavedEvents/>
+        <OverlayTrigger key="top" placement="top"
+             overlay={
+              <Tooltip>Delete all Saved Events
+              </Tooltip>
+            }> 
+        <button onClick={handleDeleteAll}  style={{position:'absolute',  right:'1rem', zIndex:'10'}} className='btn btn-danger rounded-circle px-2 border-2 fw-bold'><i className="fa-solid fa-trash"></i></button>
+        </OverlayTrigger>
       </Tab>
       <Tab eventKey="myEvents" title={<span className={getTabStyle('myEvents')}>My Events</span>}>
         <MyEvents/>

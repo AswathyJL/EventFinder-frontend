@@ -31,9 +31,10 @@ const SavedEvents = () => {
                   const result = await getSavedEventAPI(reqHeader)
                   console.log(result);
                   
-                  if(result.status == 200)
-                  {
-                      setSavedEvents(result.data)
+                  if (result.status === 200 && result.data?.savedEvents?.length > 0) {
+                    setSavedEvents(result.data);
+                  } else {
+                    setSavedEvents({ savedEvents: [] }); // Clear events if none exist
                   }
               } catch (err) {
                   console.log(err);

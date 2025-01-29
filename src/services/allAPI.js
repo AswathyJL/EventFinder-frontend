@@ -52,7 +52,7 @@ export const deleteSavedEventByIdAPI = async(reqBody,reqHeader)=>{
 }
 // deleteAllSavedEvents - /saved-events
 export const deleteAllSavedEventsAPI = async(reqHeader)=>{
-    return await commonAPI("POST",`${SERVER_URL}/remove-all-saved-events`,{},reqHeader)
+    return await commonAPI("DELETE",`${SERVER_URL}/remove-all-saved-events`,{},reqHeader)
 }
 // getMyEvents - /my-events
 // deleteMyEventsAPI - /my-events/:id
