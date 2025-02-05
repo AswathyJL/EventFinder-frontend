@@ -22,11 +22,14 @@ const EventDetail = () => {
     const [isOwner,setIsOwner] = useState(false)
     const [eventOwner, setEventOwner] = useState("")
 
+  // console.log(isOwner);
 
     useEffect(() => {
         // Fetch event details
         fetchEventDetails();
     }, [isModifyEvent]);
+
+    
     
     useEffect(() => {
         // Fetch user details once eventDetails is available
@@ -35,6 +38,12 @@ const EventDetail = () => {
         }
     }, [eventDetails]); // Dependency ensures this runs when eventDetails changes
     
+      
+    useEffect(() => {
+      if (id && eventOwner?._id) {
+          setIsOwner(id === eventOwner._id);
+      }
+  }, [eventDetails, eventOwner]);
 
     const fetchEventDetails = async ()=>{
         const token = sessionStorage.getItem("token")
@@ -190,7 +199,7 @@ const EventDetail = () => {
                             
                             <div>
                                 <OverlayTrigger
-                                    key="bottom"
+                                    key="save-event-bottom"
                                     placement="bottom"
                                     overlay={
                                       <Tooltip>Save Event
@@ -202,7 +211,7 @@ const EventDetail = () => {
                                 {
                                     isOwner && 
                                     <OverlayTrigger
-                                    key="bottom"
+                                    key="delete-event-bottom"
                                     placement="bottom"
                                     overlay={
                                       <Tooltip>Delete Event
@@ -221,7 +230,8 @@ const EventDetail = () => {
                 {/* <div className='text-danger fw-bolder'>Event not found!!!</div> */}
             </Row>
             {
-                isOwner && <ApplicantManagement/>
+                isOwner && 
+                <ApplicantManagement/>
                 
             }
         </div>

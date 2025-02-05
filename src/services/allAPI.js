@@ -63,8 +63,8 @@ export const removeEventAPI = async(id,reqHeader)=>{
 // deletePastEvents - /past-events/:id
 // deleteAllPastEvents - /past-events
 // getUser - /user-profile
-export const getProfileAPI = async(reqbody,reqHeader)=>{
-    return await commonAPI("GET",`${SERVER_URL}/profile`,reqbody,reqHeader)
+export const getProfileAPI = async(reqHeader)=>{
+    return await commonAPI("GET",`${SERVER_URL}/profile`,{},reqHeader)
 }
 // getUser by Id - /eventcard
 export const getUserDetailsByIdAPI = async(id,reqHeader)=>{
