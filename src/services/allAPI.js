@@ -36,8 +36,16 @@ export const getHomeEventsAPI = async(reqHeader)=>{
     return await commonAPI("GET",`${SERVER_URL}/home-events`,{},reqHeader)
 }
 // getEventsWithFilterAPI - /event?search=${query}
-// applyEventAPI - /apply-event-
-// getAppliedEvents - /applied-events
+// applyEventAPI - /apply-event
+export const applyEventAPI = async(reqBody,reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/apply-event`,reqBody,reqHeader)
+}
+// getAppliedEvents - event/:id/status
+export const getApplyEventStatusAPI = async(eventId,reqHeader)=>{
+    console.log("getApplyEventStatusAPI");
+    
+    return await commonAPI("GET",`${SERVER_URL}/event/${eventId}/status`,{},reqHeader)
+}
 // saveEvent - /save-event
 export const saveEventAPI = async(reqBody,reqHeader)=>{
     return await commonAPI("POST",`${SERVER_URL}/save-event`,reqBody,reqHeader)

@@ -40,8 +40,8 @@ const EventDetail = () => {
     
       
     useEffect(() => {
-      if (id && eventOwner?._id) {
-          setIsOwner(id === eventOwner._id);
+      if (eventDetails?.userId && eventOwner?._id) {
+          setIsOwner(eventDetails?.userId === eventOwner._id);
       }
   }, [eventDetails, eventOwner]);
 
