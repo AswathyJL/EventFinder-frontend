@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, Form, Modal, Row} from 'react-bootstrap';
-import { applyEventAPI, getApplyEventStatusAPI, getProfileAPI} from '../services/allAPI';
+import { applyEventAPI, cancelRegAPI, getApplyEventStatusAPI, getProfileAPI} from '../services/allAPI';
 import { useParams } from 'react-router-dom';
 import GetTicket from './GetTicket';
 
@@ -107,7 +107,29 @@ const Register = () => {
 
     // function to handle cancel registration
     const handleCancelReg = async()=>{
-
+      const token = sessionStorage.getItem("token")
+      if(token){
+        const reqHeader = {
+          "Authorization": `Bearer ${token}`
+        }
+        try {
+          const result = await cancelRegAPI(eventId,reqHeader)
+          console.log(result);
+          
+          if(result.status == 200){
+            setIsRegistered(false)
+          }
+          else if(result.status == 404){
+            setTimeout(() => {
+            alert(result)
+            handleClose()
+            }, 1000);
+          }
+        } catch (err) {
+          console.log(err);
+          
+        }
+      }
     }
 
     // function to get event registration status for current user

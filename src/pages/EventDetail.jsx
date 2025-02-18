@@ -41,7 +41,7 @@ const EventDetail = () => {
       
     useEffect(() => {
       if (eventDetails?.userId && eventOwner?._id) {
-          setIsOwner(eventDetails?.userId === eventOwner._id);
+          setIsOwner(eventDetails?.userId=== eventOwner._id);
       }
   }, [eventDetails, eventOwner]);
 
@@ -73,7 +73,7 @@ const EventDetail = () => {
             "Authorization": `Bearer ${token}`
           }
           try {
-            const result = await getUserDetailsByIdAPI(id,reqHeader)
+            const result = await getProfileAPI(reqHeader)
             // console.log(result);
             
             if(result.status == 200){

@@ -40,12 +40,18 @@ export const getHomeEventsAPI = async(reqHeader)=>{
 export const applyEventAPI = async(reqBody,reqHeader)=>{
     return await commonAPI("POST",`${SERVER_URL}/apply-event`,reqBody,reqHeader)
 }
-// getAppliedEvents - event/:id/status
+// getAppliedEvents status - event/:id/status
 export const getApplyEventStatusAPI = async(eventId,reqHeader)=>{
     console.log("getApplyEventStatusAPI");
     
     return await commonAPI("GET",`${SERVER_URL}/event/${eventId}/status`,{},reqHeader)
 }
+
+// unapply event /apply-event/:id/remove
+export const cancelRegAPI = async (id,reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/apply-event/${id}/remove`,{},reqHeader)
+}
+
 // saveEvent - /save-event
 export const saveEventAPI = async(reqBody,reqHeader)=>{
     return await commonAPI("POST",`${SERVER_URL}/save-event`,reqBody,reqHeader)
