@@ -29,7 +29,7 @@ const SavedEvents = () => {
               }
               try {
                   const result = await getSavedEventAPI(reqHeader)
-                  console.log(result);
+                  // console.log(result);
                   
                   if (result.status === 200 && result.data?.savedEvents?.length > 0) {
                     setSavedEvents(result.data);
@@ -61,7 +61,7 @@ const SavedEvents = () => {
               const result = await getEventDetailsAPI(id, reqHeader);
               if (result.status === 200) 
                 {
-                console.log(result);
+                // console.log(result);
                 return result.data; // Return event details
               }
             } catch (err) {

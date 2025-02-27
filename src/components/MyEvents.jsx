@@ -20,7 +20,7 @@ const MyEvents = () => {
             }
             try {
                 const result = await getUserEventsAPI(reqHeader)
-                console.log(result);
+                // console.log(result);
                 
                 if(result.status == 200)
                 {

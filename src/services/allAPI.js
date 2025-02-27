@@ -47,9 +47,25 @@ export const getApplyEventStatusAPI = async(eventId,reqHeader)=>{
     return await commonAPI("GET",`${SERVER_URL}/event/${eventId}/status`,{},reqHeader)
 }
 
+// get applied events
+export const getAppliedEventsAPI = async(reqHeader)=>{
+    // console.log("getAppliedEventsAPI");
+    return await commonAPI("GET",`${SERVER_URL}/apply-event/view`,{},reqHeader)
+}
+
+// get applicant details for event /apply-event/:id/details
+export const getApplicantDetailsAPI = async(eventId,reqHeader)=>{
+    return await commonAPI("GET",`${SERVER_URL}/apply-event/${eventId}/details`,{},reqHeader)
+}
+
 // unapply event /apply-event/:id/remove
 export const cancelRegAPI = async (id,reqHeader)=>{
     return await commonAPI("POST",`${SERVER_URL}/apply-event/${id}/remove`,{},reqHeader)
+}
+
+// delete applicant /apply-event/:id/remove
+export const deleteApplicantAPI = async(id,reqBody,reqHeader)=>{
+    return await commonAPI("POST",`${SERVER_URL}/apply-event/${id}/remove`,reqBody,reqHeader)
 }
 
 // saveEvent - /save-event

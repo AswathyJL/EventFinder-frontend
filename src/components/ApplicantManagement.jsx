@@ -1,7 +1,72 @@
 
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { deleteApplicantAPI, getApplicantDetailsAPI, getAppliedEventsAPI, getEventDetailsAPI } from '../services/allAPI';
+import { useParams } from 'react-router-dom';
+import { isApplicantDetailsUpdatedContext } from '../contexts/ContextAPI';
 
 const ApplicantManagement = () => {
+  const {isApplicantUpdated, setIsApplicantUpdated} = useContext(isApplicantDetailsUpdatedContext)
+  const [appliedEventsDetails, setAppliedEventsDetails] = useState("");
+  const [applicantStatus,setApplicantStatus] = useState(false)
+  const [isLoading, setIsLoading] = useState(true);
+    // console.log(appliedEvents);
+    const {id} = useParams()
+    // console.log(id);
+    console.log(appliedEventsDetails);
+    
+    useEffect(() => {
+      if (id) getApplicantDetails();
+    }, [id,isApplicantUpdated,applicantStatus]);
+  
+    const handleDeleteApplicant = async (email)=>{
+      const token = sessionStorage.getItem("token")
+          if(token)
+          {
+              const reqHeader = {
+                  "Authorization":`Bearer ${token}`
+              }
+              try {
+                  const result = await deleteApplicantAPI(id,email,reqHeader)
+                  console.log(result);
+                  
+                  if(result.status == 200)
+                  {
+                    alert("Applicant removal is successfull!!")
+                    setIsApplicantUpdated(true)
+                    setApplicantStatus(true)
+                  }
+              } catch (err) {
+                  console.log(err);
+                  
+              }
+          }
+    }
+
+    const getApplicantDetails = async ()=>{
+      const token = sessionStorage.getItem("token")
+          if(token)
+          {
+              const reqHeader = {
+                  "Authorization":`Bearer ${token}`
+              }
+              try {
+                  const result = await getApplicantDetailsAPI(id,reqHeader)
+                  console.log(result);
+                  
+                  if(result.status == 200)
+                  {
+                      setAppliedEventsDetails(result.data)
+                  }
+              } catch (err) {
+                  console.log(err);
+                  
+              }
+              finally {
+                setIsLoading(false)
+                setIsApplicantUpdated(false);
+              }
+          }
+    }
   return (
     <div>
       <h1 className='text-primary'>Registration Details of Participants</h1>
@@ -17,30 +82,25 @@ const ApplicantManagement = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>21/11/001</td>
-            <td>userName</td>
-            <td>userEmail</td>
-            <td>contact</td>
-            <td><i className="fa-solid fa-trash text-danger"></i></td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>21/11/001</td>
-            <td>userName</td>
-            <td>userEmail</td>
-            <td>contact</td>
-            <td><i className="fa-solid fa-trash text-danger"></i></td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>21/11/001</td>
-            <td>userName</td>
-            <td>userEmail</td>
-            <td>contact</td>
-            <td><i className="fa-solid fa-trash text-danger"></i></td>
-          </tr>
+          {
+            isLoading ? (
+              <div className="text-center">Loading...</div>
+            ) : appliedEventsDetails && appliedEventsDetails.registeredUser.length > 0  ? (
+              appliedEventsDetails.registeredUser.map((user, index) => (
+                <tr key={index+1}>
+                  <td>{index+1}</td>
+                  <td>{appliedEventsDetails._id}/{index+1}/{user.username}</td>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phoneNo}</td>
+                  <td><i onClick={() => handleDeleteApplicant(user.email)} className="fa-solid fa-trash text-danger"></i></td>
+                </tr>
+              ))
+            ) : (
+              <div className='text-danger fw-bolder'>No applicants yet!!!</div>
+            )
+            
+          }
         </tbody>
       </table>
     </div>

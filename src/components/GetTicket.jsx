@@ -1,21 +1,3 @@
-// import React from 'react'
-
-// const GetTicket = ({currentUser,eventId}) => {
-
-//     // console.log(currentUser);
-//     // console.log(eventId);
-    
-    
-//     // function to handle download of ticket
-//     const handleGetTicket = async()=>{
-
-//     }
-//   return (
-//     <button onClick={handleGetTicket} className='btn btn-warning rounded-pill px-4 border-2 fw-bold'>Get Ticket<i class="fa-solid fa-print ms-2"></i></button>
-//   )
-// }
-
-// export default GetTicket
 
 import React, { useEffect, useState } from 'react';
 import { Page, Text, View, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
@@ -52,7 +34,7 @@ const TicketDocument = ({ currentUser, eventDetails }) => (
 const GetTicket = ({ eventId, currentUser }) => {
 
     const [eventDetails, setEventDetails] = useState("")
-    console.log(eventDetails);
+    // console.log(eventDetails);
     
     useEffect(() => {
             // Fetch event details

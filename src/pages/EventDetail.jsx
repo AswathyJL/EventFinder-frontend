@@ -5,14 +5,14 @@ import EventCard from '../components/EventCard'
 import Register from '../components/Register'
 import ApplicantManagement from '../components/ApplicantManagement'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getEventDetailsAPI, getUserDetailsByIdAPI, removeEventAPI, saveEventAPI } from '../services/allAPI'
+import { getEventDetailsAPI, getProfileAPI, getUserDetailsByIdAPI, removeEventAPI, saveEventAPI } from '../services/allAPI'
 import AddEvent from '../components/AddEvent'
-import { isDeleteEventContext, isModifyEventContext } from '../contexts/ContextAPI'
+import { isApplicantDetailsUpdatedContext, isDeleteEventContext, isModifyEventContext } from '../contexts/ContextAPI'
 
 
 
 const EventDetail = () => {
-    
+    const {isApplicantUpdated, setIsApplicantUpdated} = useContext(isApplicantDetailsUpdatedContext)
     const [isSaved, setIsSaved] = useState(false);
     const navigate = useNavigate()
     const {isDeleteEvent, setIsDeleteEvent} = useContext(isDeleteEventContext)
@@ -22,7 +22,12 @@ const EventDetail = () => {
     const [isOwner,setIsOwner] = useState(false)
     const [eventOwner, setEventOwner] = useState("")
 
-  // console.log(isOwner);
+  //   console.log("Event Owner ID:", eventOwner?._id);
+  //   console.log("Event Details User ID:", eventDetails?.userId);
+  //   console.log("Is Owner?", isOwner);
+  //   console.log(eventOwner);
+  //   console.log(eventDetails);
+    
 
     useEffect(() => {
         // Fetch event details
@@ -41,9 +46,12 @@ const EventDetail = () => {
       
     useEffect(() => {
       if (eventDetails?.userId && eventOwner?._id) {
-          setIsOwner(eventDetails?.userId=== eventOwner._id);
+          // console.log("Comparing:", eventDetails.userId, eventOwner._id);
+          setIsOwner(eventDetails.userId === eventOwner._id);
       }
-  }, [eventDetails, eventOwner]);
+  }, [eventDetails, eventOwner]); 
+  // console.log(isOwner);
+  
 
     const fetchEventDetails = async ()=>{
         const token = sessionStorage.getItem("token")
@@ -77,8 +85,8 @@ const EventDetail = () => {
             // console.log(result);
             
             if(result.status == 200){
-              setEventOwner(result.data)
-              setIsOwner(result.data._id === eventDetails?.userId)
+              setEventOwner(result.data[0])
+              // setIsOwner(result.data._id === eventDetails?.userId)
             }
           } catch (err) {
             console.log(err);

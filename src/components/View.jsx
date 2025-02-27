@@ -73,9 +73,9 @@ const View = () => {
         <MyEvents/>
         <AddEvent/>
       </Tab>
-      <Tab eventKey="past" title={<span className={getTabStyle('past')}>Past Events</span>}>
+      {/* <Tab eventKey="past" title={<span className={getTabStyle('past')}>Past Events</span>}>
         <PastEvents/>
-      </Tab>
+      </Tab> */}
       <Tab eventKey="profile" title={<span className={getTabStyle('profile')}>Profile</span>}>
         <Profile/>
       </Tab>

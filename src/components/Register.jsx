@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Col, Form, Modal, Row} from 'react-bootstrap';
 import { applyEventAPI, cancelRegAPI, getApplyEventStatusAPI, getProfileAPI} from '../services/allAPI';
 import { useParams } from 'react-router-dom';
 import GetTicket from './GetTicket';
+import { isApplicantDetailsUpdatedContext } from '../contexts/ContextAPI';
 
 
 const Register = () => {
-
+  const {isApplicantUpdated, setIsApplicantUpdated} = useContext(isApplicantDetailsUpdatedContext)
   const {id:eventId} = useParams()
   const [isSelfBook, setIsSelfBook] = useState(false)
   const [isRegistered, setIsRegistered] = useState(false)
@@ -89,6 +90,7 @@ const Register = () => {
             const result = await applyEventAPI(reqbody, reqHeader);
             if (result.status === 200) {
                 setIsRegistered(true); // Mark as saved
+                setIsApplicantUpdated(true)
                 alert("Registration Successful.");
                 console.log(inputData);
                 // reset and closing modal
@@ -164,7 +166,7 @@ const Register = () => {
         }
         try {
           const result = await getProfileAPI(reqHeader)
-          console.log(result);
+          // console.log(result);
           
           if(result.status == 200){
             setCurrentUser(result.data[0])
