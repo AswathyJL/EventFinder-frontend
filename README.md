@@ -4,6 +4,7 @@ EventFinder is a web application that allows users to browse, apply for, and man
 
 ## 🔗 Live Demo
 [EventFinder Frontend](https://event-finder-frontend-peach.vercel.app) 
+
 [EventFinder Backend](https://eventfinder-backend-mg3t.onrender.com) 
 
 ## 🚀 Getting Started
