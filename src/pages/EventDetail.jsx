@@ -1,14 +1,13 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import { Col, OverlayTrigger, Row, Tooltip } from 'react-bootstrap'
-import EventCard from '../components/EventCard'
 import Register from '../components/Register'
 import ApplicantManagement from '../components/ApplicantManagement'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getEventDetailsAPI, getProfileAPI, getUserDetailsByIdAPI, removeEventAPI, saveEventAPI } from '../services/allAPI'
+import { getAllEventsAPI, getEventDetailsAPI, getProfileAPI, getUserDetailsByIdAPI, removeEventAPI, saveEventAPI } from '../services/allAPI'
 import AddEvent from '../components/AddEvent'
 import { isApplicantDetailsUpdatedContext, isDeleteEventContext, isModifyEventContext } from '../contexts/ContextAPI'
-
+import MapComponent from "../components/MapComponent";
 
 
 const EventDetail = () => {
@@ -26,7 +25,8 @@ const EventDetail = () => {
   //   console.log("Event Details User ID:", eventDetails?.userId);
   //   console.log("Is Owner?", isOwner);
   //   console.log(eventOwner);
-  //   console.log(eventDetails);
+    console.log(eventDetails);
+    console.log("Event Location Link:", eventDetails.location_link);
     
 
     useEffect(() => {
@@ -51,7 +51,46 @@ const EventDetail = () => {
       }
   }, [eventDetails, eventOwner]); 
   // console.log(isOwner);
+
+  const [nearbyEvents, setNearbyEvents] = useState([]);
+  console.log("nearbyevents: ",nearbyEvents);
   
+  
+  useEffect(() => {
+    if (eventDetails?.startDate) {
+      getAllEvents();
+    }
+  }, [eventDetails]);
+
+  const getAllEvents = async ()=>{
+      const token = sessionStorage.getItem("token")
+      if(token){
+        const reqHeader = {
+          "Authorization": `Bearer ${token}`
+        }
+        try {
+          const result = await getAllEventsAPI("",reqHeader)
+          if(result.status == 200){
+            // Extract month from the current event
+            const eventMonth = eventDetails.startDate.split("-")[1];
+
+            // Filter nearby events (same month & with valid location links)
+            const nearbyEvents = result.data
+              .filter(event => event.startDate.split("-")[1] === eventMonth) // Filter events in the same month
+              .map(event => ({
+                ...event,
+                location: extractLatLng(event.location_link),
+              }))
+              .filter(event => event.location_link); // Keep only events with valid locations
+
+            setNearbyEvents(nearbyEvents); // Store nearby events
+              }
+        } catch (err) {
+          console.log(err);
+          
+        }
+      }
+    }
 
     const fetchEventDetails = async ()=>{
         const token = sessionStorage.getItem("token")
@@ -143,6 +182,7 @@ const EventDetail = () => {
           }
       };
 
+      // convert date to dd mm yyyy format
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0'); // Ensures two digits
@@ -150,7 +190,25 @@ const EventDetail = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     };
-
+    
+    // Extracts latitude and longitude if available in the URL
+    const extractLatLng = (locationLink) => {
+      try {
+        const match = locationLink.match(/@([\d.-]+),([\d.-]+)/);
+        if (match) {
+          const lat = parseFloat(match[1]);
+          const lng = parseFloat(match[2]);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            console.log(lat, lng);
+            
+            return { lat, lng };
+          }
+        }
+      } catch (error) {
+        console.error("Error extracting lat/lng:", error);
+      }
+      return { lat: null, lng: null }; // Return null instead of invalid values
+    };
   return (
     <>
         <div style={{paddingTop:'100px'}} className='px-2 px-md-5'>
@@ -243,17 +301,16 @@ const EventDetail = () => {
                 
             }
         </div>
-        <div className='mt-5 px-2 px-md-5'>
-          <h1 className='mb-5 text-primary'>Similar Events</h1>
-          <marquee behavior="" direction="">
-              <div className="d-flex">
-                  <div className="me-5">
-                      <EventCard />
-                  </div>
-              </div>
-          </marquee>
-          <button className='btn btn-link mt-5'>CLICK HERE TO VIEW MORE EVENTS...</button>
-      </div>
+        <div className="mt-3">
+          <h3 className="text-primary">Location</h3>
+          {extractLatLng(eventDetails?.location_link) ? (
+            <MapComponent eventLocation={extractLatLng(eventDetails?.location_link)} nearbyEvents={nearbyEvents}/>
+          ) : (
+            <a href={eventDetails?.location_link} target="_blank" rel="noopener noreferrer">
+              View on Google Maps
+            </a>
+          )}
+        </div>
     </>
   )
 }

@@ -39,7 +39,7 @@ const AllEvents = () => {
       <div style={{paddingTop:'100px'}} className='px-2 px-md-5'>
         <div className="d-flex justify-content-between">
           <h1 className='text-primary'>All Events</h1>
-          <Filter/>
+          {/* <Filter/> */}
         </div>
         <Row className='mt-3'>
             {

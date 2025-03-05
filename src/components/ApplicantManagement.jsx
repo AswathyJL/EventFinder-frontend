@@ -16,7 +16,7 @@ const ApplicantManagement = () => {
     
     useEffect(() => {
       if (id) getApplicantDetails();
-    }, [id,isApplicantUpdated,applicantStatus]);
+    }, [id,isApplicantUpdated]);
   
     const handleDeleteApplicant = async (email)=>{
       const token = sessionStorage.getItem("token")
@@ -32,8 +32,12 @@ const ApplicantManagement = () => {
                   if(result.status == 200)
                   {
                     alert("Applicant removal is successfull!!")
-                    setIsApplicantUpdated(true)
-                    setApplicantStatus(true)
+                   // Update the state immediately
+                    setAppliedEventsDetails(prevState => ({
+                      ...prevState,
+                      registeredUser: prevState.registeredUser.filter(user => user.email !== email)
+                    }));
+                    setApplicantStatus(prev => !prev)
                   }
               } catch (err) {
                   console.log(err);
@@ -51,7 +55,7 @@ const ApplicantManagement = () => {
               }
               try {
                   const result = await getApplicantDetailsAPI(id,reqHeader)
-                  console.log(result);
+                  // console.log(result);
                   
                   if(result.status == 200)
                   {
