@@ -20,11 +20,12 @@ const EventDetail = () => {
     const [eventDetails, setEventDetails] = useState("")
     const [isOwner,setIsOwner] = useState(false)
     const [eventOwner, setEventOwner] = useState("")
+    const [currentUser, setCurrentUser] = useState("")
 
   //   console.log("Event Owner ID:", eventOwner?._id);
   //   console.log("Event Details User ID:", eventDetails?.userId);
   //   console.log("Is Owner?", isOwner);
-  //   console.log(eventOwner);
+    console.log(eventOwner);
     console.log(eventDetails);
     console.log("Event Location Link:", eventDetails.location_link);
     
@@ -40,6 +41,7 @@ const EventDetail = () => {
         // Fetch user details once eventDetails is available
         if (eventDetails?.userId) {
             getUserDetails(eventDetails.userId);
+            getCurrentUserDetail()
         }
     }, [eventDetails]); // Dependency ensures this runs when eventDetails changes
     
@@ -47,7 +49,7 @@ const EventDetail = () => {
     useEffect(() => {
       if (eventDetails?.userId && eventOwner?._id) {
           // console.log("Comparing:", eventDetails.userId, eventOwner._id);
-          setIsOwner(eventDetails.userId === eventOwner._id);
+          setIsOwner(eventDetails.userId === currentUser._id);
       }
   }, [eventDetails, eventOwner]); 
   // console.log(isOwner);
@@ -120,11 +122,11 @@ const EventDetail = () => {
             "Authorization": `Bearer ${token}`
           }
           try {
-            const result = await getProfileAPI(reqHeader)
+            const result = await getUserDetailsByIdAPI(id,reqHeader)
             // console.log(result);
-            
+            console.log("API Response:", result.data);
             if(result.status == 200){
-              setEventOwner(result.data[0])
+              setEventOwner(result.data)
               // setIsOwner(result.data._id === eventDetails?.userId)
             }
           } catch (err) {
@@ -134,6 +136,26 @@ const EventDetail = () => {
         }
       }
 
+      const getCurrentUserDetail = async () =>{
+        const token = sessionStorage.getItem("token")
+        if(token){
+          const reqHeader = {
+            "Authorization": `Bearer ${token}`
+          }
+          try {
+            const result = await getProfileAPI(reqHeader)
+            // console.log(result);
+            console.log("API Response:", result.data[0]);
+            if(result.status == 200){
+              setCurrentUser(result.data[0])
+              // setIsOwner(result.data._id === eventDetails?.userId)
+            }
+          } catch (err) {
+            console.log(err);
+            
+          }
+        }
+      }
       const handleDeleteEvent = async (id) => {
         const token = sessionStorage.getItem("token");
       
