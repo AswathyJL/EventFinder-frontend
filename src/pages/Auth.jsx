@@ -14,7 +14,10 @@ const Auth = ({insideRegister}) => {
     username:"", email:"", password:""
   })
 //   console.log(inputData);
-
+const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
     //function handling register
   const handleRegister = async (e)=>{
     e.preventDefault()
@@ -22,6 +25,10 @@ const Auth = ({insideRegister}) => {
     // call server after validation of values present
     if(inputData.username && inputData.email && inputData.password)
     {
+        if (!validateEmail(inputData.email)) {
+            alert("Please enter a valid email address");
+            return;
+          }
         try {
             const result = await registerAPI(inputData)
             console.log(result);
